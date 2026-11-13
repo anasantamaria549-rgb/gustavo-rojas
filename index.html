@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexo Rent Car - Busca tu carro</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;color:#111}
+    .car-system{max-width:1220px;margin:30px auto;padding:0 10px}
+    .panel{background:#fff;border:1px solid #ddd;display:grid;grid-template-columns:400px 230px 1fr;min-height:450px}
+    .search,.types,.featured{padding:18px}
+    .search{border-right:1px solid #ddd}
+    .types{border-right:1px solid #ddd}
+    h2{font-size:25px;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid #ddd}
+    h2 .red{color:#ef3028}
+    .field{display:grid;grid-template-columns:78px 1fr;align-items:center;gap:8px;margin:7px 0}
+    label{font-weight:700}
+    select{width:100%;height:38px;border:1px solid #ccc;border-radius:3px;background:#fff;padding:0 10px;font-size:14px}
+    .range{display:grid;grid-template-columns:1fr 45px 1fr;align-items:center;gap:7px}
+    .range span{text-align:center;color:#999}
+    .links{margin-top:14px;display:flex;flex-direction:column;gap:7px;color:#ef3028;font-weight:700;font-size:14px}
+    .search-btn{float:right;margin-top:-34px;background:#ef3028;color:#fff;border:0;padding:12px 22px;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 2px 5px #bbb}
+    .search-btn:hover{background:#d9221b}
+    .type{display:flex;align-items:center;gap:12px;margin:14px 0;color:#ef3028;font-weight:700}
+    .type-icon{width:76px;height:40px;display:flex;align-items:center;justify-content:center;color:#aaa}
+    .type-icon svg{width:70px;height:35px;fill:none;stroke:#aaa;stroke-width:2}
+    .type:hover{color:#d9221b;cursor:pointer}
+    .featured h2{margin-bottom:14px}
+    .vehicle-wrap{display:grid;grid-template-columns:100px 1fr;gap:14px}
+    .thumbs{display:flex;flex-direction:column;gap:9px}
+    .thumb{width:100px;height:67px;border:2px solid transparent;cursor:pointer;object-fit:cover;background:#eee}
+    .thumb.active{border-color:#ef3028}
+    .main-car{border:2px solid #ef3028;background:#111;position:relative;min-height:310px;overflow:hidden}
+    .main-car img{width:100%;height:310px;display:block;object-fit:cover}
+    .car-caption{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.75));padding:35px 12px 10px;color:#fff;display:flex;justify-content:space-between;align-items:end;font-size:16px}
+    .empty{display:none;margin-top:15px;padding:20px;text-align:center;border:1px solid #ddd;background:#fafafa;color:#666}
+    @media(max-width:950px){
+      .panel{grid-template-columns:1fr}
+      .search,.types{border-right:0;border-bottom:1px solid #ddd}
+      .featured{min-height:430px}
+    }
+    @media(max-width:600px){
+      .vehicle-wrap{grid-template-columns:75px 1fr}
+      .thumb{width:75px;height:58px}
+      .main-car img{height:270px}
+      .field{grid-template-columns:70px 1fr}
+      .search-btn{float:none;margin:15px 0 0;width:100%}
+    }
+  </style>
+</head>
+<body>
+  <section class="car-system" aria-label="Sistema de búsqueda de vehículos">
+    <div class="panel">
+      <div class="search">
+        <h2>¡<span class="red">Busca</span> tu Carro!</h2>
+
+        <div class="field">
+          <label for="estado">Estado:</label>
+          <select id="estado">
+            <option value="all">Nuevo/Usado</option>
+            <option value="Nuevo">Nuevo</option>
+            <option value="Usado">Usado</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="marca">Marca:</label>
+          <select id="marca"></select>
+        </div>
+
+        <div class="field">
+          <label for="modelo">Modelo:</label>
+          <select id="modelo"></select>
+        </div>
+
+        <div class="field">
+          <label>Año:</label>
+          <div class="range">
+            <select id="anioMin"></select><span>hasta</span><select id="anioMax"></select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="moneda">Moneda:</label>
+          <select id="moneda">
+            <option value="all">Moneda</option>
+            <option value="USD">USD</option>
+            <option value="DOP">DOP</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Precio:</label>
+          <div class="range">
+            <select id="precioMin"></select><span>hasta</span><select id="precioMax"></select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="lugar">Lugar:</label>
+          <select id="lugar">
+            <option value="all">Todas las Provincias</option>
+            <option>Santo Domingo</option>
+            <option>Santiago</option>
+            <option>La Romana</option>
+            <option>Puerto Plata</option>
+            <option>San Cristóbal</option>
+          </select>
+        </div>
+
+        <div class="links">
+          <span>Buscar por Código</span>
+          <span>Búsqueda Avanzada</span>
+        </div>
+        <button class="search-btn" id="buscar">Buscar »</button>
+      </div>
+
+      <div class="types">
+        <h2>Tipos</h2>
+        <div class="type" data-type="Sedán"><div class="type-icon">🚘</div><span>Sedán</span></div>
+        <div class="type" data-type="Compacto"><div class="type-icon">🚗</div><span>Compacto</span></div>
+        <div class="type" data-type="Jeepeta"><div class="type-icon">🚙</div><span>Jeepeta</span></div>
+        <div class="type" data-type="Camioneta"><div class="type-icon">🛻</div><span>Camioneta</span></div>
+        <div class="type" data-type="Coupé/Sport"><div class="type-icon">🏎️</div><span>Coupé/Sport</span></div>
+        <div class="type" data-type="all"><div class="type-icon">🚘</div><span>Ver Todos!</span></div>
+      </div>
+
+      <div class="featured">
+        <h2>Los SuperCarros</h2>
+        <div class="vehicle-wrap">
+          <div class="thumbs" id="thumbs"></div>
+          <div class="main-car" id="mainCar"></div>
+        </div>
+        <div class="empty" id="empty">No se encontraron vehículos con esos filtros.</div>
+      </div>
+    </div>
+  </section>
+
+<script>
+const cars = [
+  {
+    id:1, marca:"Volvo", modelo:"XC40", tipo:"Jeepeta", estado:"Nuevo", anio:2027,
+    moneda:"USD", precio:59900, lugar:"Santo Domingo",
+    img:"https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=1200&q=85"
+  },
+  {
+    id:2, marca:"Toyota", modelo:"Corolla", tipo:"Sedán", estado:"Nuevo", anio:2024,
+    moneda:"USD", precio:28500, lugar:"Santo Domingo",
+    img:"https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&w=1200&q=85"
+  },
+  {
+    id:3, marca:"Hyundai", modelo:"Tucson", tipo:"Jeepeta", estado:"Nuevo", anio:2024,
+    moneda:"USD", precio:34500, lugar:"Santiago",
+    img:"https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=85"
+  },
+  {
+    id:4, marca:"Kia", modelo:"Sportage", tipo:"Jeepeta", estado:"Usado", anio:2023,
+    moneda:"USD", precio:29900, lugar:"La Romana",
+    img:"https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1200&q=85"
+  },
+  {
+    id:5, marca:"Honda", modelo:"Civic", tipo:"Sedán", estado:"Usado", anio:2022,
+    moneda:"USD", precio:23900, lugar:"Puerto Plata",
+    img:"https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&w=1200&q=85"
+  }
+];
+
+const $ = id => document.getElementById(id);
+const unique = a => [...new Set(a)];
+
+function fillSelect(id, values, first){
+  const s=$(id);
+  s.innerHTML = `<option value="all">${first}</option>` + values.map(v=>`<option>${v}</option>`).join("");
+}
+fillSelect("marca", unique(cars.map(c=>c.marca)), "Todas las Marcas");
+fillSelect("modelo", unique(cars.map(c=>c.modelo)), "Todos los Modelos");
+fillSelect("anioMin", unique(cars.map(c=>c.anio).sort()), "-");
+fillSelect("anioMax", unique(cars.map(c=>c.anio).sort()), "-");
+fillSelect("precioMin", [15000,20000,25000,30000,40000,50000], "-");
+fillSelect("precioMax", [25000,30000,40000,50000,60000,80000], "-");
+
+function render(list){
+  const thumbs=$("thumbs"), main=$("mainCar"), empty=$("empty");
+  thumbs.innerHTML="";
+  if(!list.length){main.innerHTML="";empty.style.display="block";return}
+  empty.style.display="none";
+  list.forEach((car,i)=>{
+    const img=document.createElement("img");
+    img.className="thumb"+(i===0?" active":"");
+    img.src=car.img; img.alt=car.marca+" "+car.modelo;
+    img.onclick=()=>showCar(car,img);
+    thumbs.appendChild(img);
+  });
+  showCar(list[0], thumbs.firstChild);
+}
+function showCar(car, clicked){
+  document.querySelectorAll(".thumb").forEach(x=>x.classList.remove("active"));
+  if(clicked) clicked.classList.add("active");
+  $("mainCar").innerHTML=`
+    <img src="${car.img}" alt="${car.marca} ${car.modelo}">
+    <div class="car-caption"><span>${car.anio} ${car.marca} ${car.modelo}</span><strong>${car.moneda==="USD"?"US$":"RD$"} ${car.precio.toLocaleString()}</strong></div>`;
+}
+function filterCars(type="all"){
+  const marca=$("marca").value, modelo=$("modelo").value, estado=$("estado").value;
+  const moneda=$("moneda").value, lugar=$("lugar").value;
+  const amin=$("anioMin").value, amax=$("anioMax").value;
+  const pmin=$("precioMin").value, pmax=$("precioMax").value;
+  let list=cars.filter(c=>
+    (type==="all"||c.tipo===type) &&
+    (marca==="all"||c.marca===marca) &&
+    (modelo==="all"||c.modelo===modelo) &&
+    (estado==="all"||c.estado===estado) &&
+    (moneda==="all"||c.moneda===moneda) &&
+    (lugar==="all"||c.lugar===lugar) &&
+    (amin==="all"||c.anio>=+amin) &&
+    (amax==="all"||c.anio<=+amax) &&
+    (pmin==="all"||c.precio>=+pmin) &&
+    (pmax==="all"||c.precio<=+pmax)
+  );
+  render(list);
+}
+$("buscar").onclick=()=>filterCars();
+document.querySelectorAll(".type").forEach(t=>t.onclick=()=>filterCars(t.dataset.type));
+$("marca").onchange=()=>filterCars();
+$("modelo").onchange=()=>filterCars();
+$("estado").onchange=()=>filterCars();
+$("moneda").onchange=()=>filterCars();
+$("lugar").onchange=()=>filterCars();
+$("anioMin").onchange=()=>filterCars();
+$("anioMax").onchange=()=>filterCars();
+$("precioMin").onchange=()=>filterCars();
+$("precioMax").onchange=()=>filterCars();
+
+render(cars);
+</script>
+</body>
+</html>
